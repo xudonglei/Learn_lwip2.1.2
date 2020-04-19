@@ -4,6 +4,11 @@
  * This file is deliberately included multiple times: once with empty
  * definition of LWIP_MEMPOOL() to handle all includes and multiple times
  * to build up various lists of mem pools.
+ * lwIP内部的内存池，不应该在应用程序中使用。
+ * 最开头没有#ifndef，所以该文件可以被多次编译。里面全是宏定义，为了实现方便，在不同的地方
+ * 调用#include "lwip/priv/memp_std.h"就能产生不同的效果。该文件中的宏值定义依赖于宏LWIP_MEMPOOL(name,num,size,desc)，
+ * 这样，只要外部提供的该宏值不同，则包含该文件的源文件在编译器的预处理后，就会产生不一样的结果。
+ * 这样，就可以通过在不同的地方多次包含该文件，前面必定提供宏值MEMPOOL以产生不同结果。这就是优秀的代码，只能666。
  */
 
 /*
@@ -145,6 +150,9 @@ LWIP_PBUF_MEMPOOL(PBUF_POOL, PBUF_POOL_SIZE,           PBUF_POOL_BUFSIZE,       
 /*
  * REQUIRED CLEANUP: Clear up so we don't get "multiply defined" error later
  * (#undef is ignored for something that is not defined)
+ * 对LWIP_MEMPOOL宏定义进行撤销，因为该文件很会被多个地方调用，在每个调用的地方会重新定义这个宏定义的功能，
+ * 所以在文件的末尾添加这句#undef LWIP_MEMPOOL 代码是非常有必要的。
+ * 
  */
 #undef LWIP_MEMPOOL
 #undef LWIP_MALLOC_MEMPOOL

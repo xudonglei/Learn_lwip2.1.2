@@ -267,6 +267,10 @@ typedef int ssize_t;
  * or more portable:\n
  * \#define LWIP_DECLARE_MEMORY_ALIGNED(variable_name, size) u32_t variable_name[(size + sizeof(u32_t) - 1) / sizeof(u32_t)]
  */
+/*
+lwip库自己实现的堆申请并不是我平时用系统C语言malloc函数一样，申请后内存真的在堆上（.s中说的那个heap_size）
+而是定义完一块内存后，在这块内存实现堆申请，释放.是在variable_name数组上实现堆分配的。这个size是可以在宏定义修改大小的.
+*/
 #ifndef LWIP_DECLARE_MEMORY_ALIGNED
 #define LWIP_DECLARE_MEMORY_ALIGNED(variable_name, size) u8_t variable_name[LWIP_MEM_ALIGN_BUFFER(size)]
 #endif
@@ -275,6 +279,10 @@ typedef int ssize_t;
  * multiple of MEM_ALIGNMENT (e.g. LWIP_MEM_ALIGN_SIZE(3) and
  * LWIP_MEM_ALIGN_SIZE(4) will both yield 4 for MEM_ALIGNMENT == 4).
  */
+/*
+这个宏的作用就是将指定的大小处理成对其后大小，对其的大小由用户提供宏值MEM_ALIGNMENT来决定。
+其中size为想要分配的大小.
+*/
 #ifndef LWIP_MEM_ALIGN_SIZE
 #define LWIP_MEM_ALIGN_SIZE(size) (((size) + MEM_ALIGNMENT - 1U) & ~(MEM_ALIGNMENT-1U))
 #endif

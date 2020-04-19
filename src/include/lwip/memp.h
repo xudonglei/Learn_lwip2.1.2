@@ -49,6 +49,20 @@ extern "C" {
 #include "lwip/priv/memp_std.h"
 
 /** Create the list of all memory pools managed by memp. MEMP_MAX represents a NULL pool at the end */
+/*
+  memp_std.h本质是由一个个LWIP_MEMPOOL宏组成，所以编译器对他们依次进行替换，这样当memp_std.h编译完后，
+  memp_t就建立起来了，为每类POOL定义一个名称/编号，其内容大致长下面的样子：
+  typedef enum
+  {
+    MEMP_RAW_PCB，
+    MEMP_UDP_PCB,
+    MEMP_TCP_PCB,
+    .....
+    MEMP_MAX  //代表了枚举元素中的元素总个数。
+  } memp_t;
+  memp_t类型在整个内存池管理中起着最重要的作用，通过内存池函数申请空间时，唯一参数就是memp_t类型的，它告诉
+  内存分配函数在哪种类型的POOL中去查找空余空间。
+*/
 typedef enum {
 #define LWIP_MEMPOOL(name,num,size,desc)  MEMP_##name,
 #include "lwip/priv/memp_std.h"
@@ -66,6 +80,11 @@ extern const struct memp_desc* const memp_pools[MEMP_MAX];
  */
 #define LWIP_MEMPOOL_PROTOTYPE(name) extern const struct memp_desc memp_ ## name
 
+/*
+默认情况下为 0，表示不从内存堆中分配，内存池为独立一块内存实现。
+若定义MEM_USE_POOLS=1，用内存池来实现内存堆分配，即不用堆来申请、释放内存，而是用内存池的实现方式来使用malloc，free这些函数。
+若定义MEMP_MEM_MALLOC=1，内存池的实现不采用原先的方式，即不使用先申请分配一定数量的、大小相等(一般情况下)的内存块留作备用这种方式，而是使用堆分配。
+*/
 #if MEMP_MEM_MALLOC
 
 #define LWIP_MEMPOOL_DECLARE(name,num,size,desc) \

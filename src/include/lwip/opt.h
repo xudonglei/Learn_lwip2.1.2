@@ -48,7 +48,7 @@
  * Include user defined options first. Anything not defined in these files
  * will be set to standard values. Override anything you don't like!
  */
-#include "lwipopts.h"
+#include "lwipopts.h"//用户提供的头文件，用来配置
 #include "lwip/debug.h"
 
 /**
@@ -1175,6 +1175,9 @@
  */
 /**
  * LWIP_UDP==1: Turn on UDP.
+ * LWIP_UDP如果定义为1，在编译的时候与UDP控制块数据结构相关的内存池POOL(MEMP_UDP_PCB)就会被建立。
+ * 对于某种类型的POOL,其单个大小是固定的，但是该类型POOL分配与否以及分配的个数是用户可以配置的，用户
+ * 根据协议栈实际使用情况进行配置(在lwipopts.h中进行配置，否则系统将使用opt.h中的默认配置值)
  */
 #if !defined LWIP_UDP || defined __DOXYGEN__
 #define LWIP_UDP                        1

@@ -78,6 +78,10 @@
 #define LWIP_MEMPOOL(name,num,size,desc) LWIP_MEMPOOL_DECLARE(name,num,size,desc)
 #include "lwip/priv/memp_std.h"
 
+/*
+memp_pools数组的元素是取对应类型的内存池结构体类型的地址，
+通过这个地址就可以找到这个类型的内存池的所有信息。
+*/
 const struct memp_desc *const memp_pools[MEMP_MAX] = {
 #define LWIP_MEMPOOL(name,num,size,desc) &memp_ ## name,
 #include "lwip/priv/memp_std.h"

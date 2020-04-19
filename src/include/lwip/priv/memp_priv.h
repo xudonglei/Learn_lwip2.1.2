@@ -104,6 +104,9 @@ typedef enum {
 #define MEMP_POOL_LAST   ((memp_t) MEMP_POOL_HELPER_LAST)
 #endif /* MEM_USE_POOLS && MEMP_USE_CUSTOM_POOLS */
 
+/*
+包含了描述一个类型池的相关信息。 
+*/
 /** Memory pool descriptor */
 struct memp_desc {
 #if defined(LWIP_DEBUG) || MEMP_OVERFLOW_CHECK || LWIP_STATS_DISPLAY
@@ -118,6 +121,10 @@ struct memp_desc {
   /** Element size */
   u16_t size;
 
+/*
+该宏值定义是否使用lwip内存堆分配策略实现内存池分配（即：要从内存池中获取内存时，实际是
+从内存堆中分配）。默认情况下为 0，表示不从内存堆中分配，内存池为独立一块内存实现。
+*/
 #if !MEMP_MEM_MALLOC
   /** Number of elements */
   u16_t num;
