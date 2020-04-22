@@ -143,7 +143,7 @@ struct memp_desc {
 #define DECLARE_LWIP_MEMPOOL_DESC(desc)
 #endif
 
-#if MEMP_STATS
+#if MEMP_STATS  //内存链表统计
 #define LWIP_MEMPOOL_DECLARE_STATS_INSTANCE(name) static struct stats_mem name;
 #define LWIP_MEMPOOL_DECLARE_STATS_REFERENCE(name) &name,
 #else
