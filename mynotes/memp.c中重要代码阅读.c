@@ -122,3 +122,61 @@ void memp_init_pool(const struct memp_desc *desc)
   }
 }
 //到这里所有内存池的定义和初始化已经完成了,可以看图："lwip初始化后的pool结构by野火"。
+
+4.//每一个类型的池最后由，tab将所有的空闲池串起来，组成一个内存池单向链表。
+  //到此最难理解的部分已经完了，接下来内存池的内存分配和释放就是很简单的内容了。
+  //内存申请
+  void * memp_malloc(memp_t type){
+    void *memp;
+    // 取对应内存池的控制块
+    memp = do_memp_malloc_pool(memp_pools[type]);
+    return memp;
+  }
+  //这个函数内部实际上调用了do_memp_malloc_pool简化后如下，
+  static void * do_memp_malloc_pool(const struct memp_desc *desc)
+  {
+    struct memp *memp;
+    SYS_ARCH_DECL_PROTECT(old_level);
+    SYS_ARCH_PROTECT(old_level);
+    memp = *desc->tab;  //注意这里的->的优先级高
+
+    if (memp != NULL) 
+    {
+      *desc->tab = memp->next; 
+      SYS_ARCH_UNPROTECT(old_level);
+      /* cast through u8_t* to get rid of alignment warnings */
+      return ((u8_t *)memp + MEMP_SIZE);
+    } 
+    else
+    {
+      SYS_ARCH_UNPROTECT(old_level);
+    }
+    return NULL;
+  }
+  //因为tab是空闲pool的头，所以内存申请直接就是返回tab指向pool就可以了。
+  //同时内存释放就是将pool重新插入单向链表的操作了。具体简化的代码如下：
+  void memp_free(memp_t type, void *mem)
+  {
+    if (mem == NULL) {
+      return;
+    }
+    do_memp_free_pool(memp_pools[type], mem);
+  }
+  //调用do_memp_free_pool
+  static void do_memp_free_pool(const struct memp_desc *desc, void *mem)
+  {
+    struct memp *memp;
+    SYS_ARCH_DECL_PROTECT(old_level);
+
+    /* cast through void* to get rid of alignment warnings */
+    memp = (struct memp *)(void *)((u8_t *)mem - MEMP_SIZE);
+    SYS_ARCH_PROTECT(old_level);
+    memp->next = *desc->tab;
+    *desc->tab = memp;
+
+    SYS_ARCH_UNPROTECT(old_level);
+  }
+  //其中内存池的溢出检测部分没有说，但是已经可以帮助我们使用LWIP了，
+  //看了#include "lwip/priv/memp_std.h"文件就知道，内存池的出现就是为一些特殊的长度固定的数据结构设计的，
+  //他分配快速，释放亦是，并且很定不会有内存碎片，但是这还是一种空间换时间的做法，
+  //因为内存池申请函数，支持如果当前尺寸的pool用完了，可以分配更大的池。
