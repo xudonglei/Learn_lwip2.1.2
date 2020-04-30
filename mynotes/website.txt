@@ -6,3 +6,10 @@ https://www.kancloud.cn/jiejietop/tcpip/988526 LwIP应用开发实战指南
 https://blog.csdn.net/u010561799/article/details/105266379   lwip内存池
 
 https://www.wandouip.com/t5i323618/  LWIP再探----内存池管理
+==========================================================================
+
+https://blog.csdn.net/u014170207/article/details/89260169  
+https://blog.csdn.net/lushoumin/article/details/99236573
+https://www.cnblogs.com/w-smile/p/11031286.html
+https://www.kancloud.cn/jiejietop/tcpip/988523
+
